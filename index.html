@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestros 3 Meses 🧡</title>
+    <style>
+        
+        :root {
+            --bg-color: #0b0c10;
+            --text-main: #c5c6c7;
+            --accent-1: #66fcf1;
+            --accent-2: #45a29e;
+            --love-color: #ff4d6d;
+            --card-bg: #1f2833;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden; 
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px #fff; }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+            animation: shoot 3s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes shoot {
+            0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 1; }
+            100% { transform: translateX(-1000px) translateY(1000px) rotate(-45deg); opacity: 0; }
+        }
+
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: opacity 1s ease, transform 1s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+
+        .screen.hidden {
+            transform: scale(1.1);
+        }
+
+
+        .title-glitch {
+            font-size: 4rem;
+            color: var(--accent-1);
+            text-shadow: 0 0 20px var(--accent-2);
+            margin-bottom: 20px;
+            text-align: center;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .radar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-2);
+            position: relative;
+            margin: 40px 0;
+            box-shadow: 0 0 30px rgba(69, 162, 158, 0.3);
+        }
+
+        .radar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg, transparent 70%, rgba(102, 252, 241, 0.5) 100%);
+            border-radius: 50%;
+            transform-origin: 0 0;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: rotate(0deg) translate(-50%, -50%); }
+            100% { transform: rotate(360deg) translate(-50%, -50%); }
+        }
+
+        .radar-point {
+            width: 15px;
+            height: 15px;
+            background-color: var(--love-color);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 15px var(--love-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        .point-you { top: 30%; left: 20%; }
+        .point-me { bottom: 30%; right: 20%; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(255, 77, 109, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+        }
+
+        .btn-start {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: transparent;
+            color: var(--accent-1);
+            border: 2px solid var(--accent-1);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-start:hover {
+            background: var(--accent-1);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-1);
+        }
+
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .game-info h2 { color: var(--accent-1); font-size: 2rem; }
+        .game-info p { color: var(--text-main); font-size: 1.2rem; margin-top: 10px; }
+
+        .memory-game {
+            width: 640px;
+            height: 640px;
+            display: flex;
+            flex-wrap: wrap;
+            perspective: 1000px;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .memory-card {
+            width: calc(25% - 15px);
+            height: calc(25% - 15px);
+            position: relative;
+            transform: scale(1);
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+        }
+
+        .memory-card:active { transform: scale(0.97); transition: transform 0.2s; }
+        .memory-card.flip { transform: rotateY(180deg); }
+
+        .front-face, .back-face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border-radius: 10px;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .front-face {
+            background: var(--card-bg);
+            border: 2px solid var(--accent-2);
+            transform: rotateY(180deg);
+        }
+
+        .back-face {
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-1));
+            border: 2px solid var(--accent-1);
+        }
+
+        .svg-icon { width: 60%; height: 60%; fill: var(--love-color); }
+
+
+        .letter-container {
+            width: 80%;
+            max-width: 800px;
+            background: rgba(31, 40, 51, 0.8);
+            border: 1px solid var(--accent-2);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            box-shadow: 0 0 40px rgba(69, 162, 158, 0.2);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 1.5s ease;
+        }
+
+        .screen.active .letter-container {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .letter-title {
+            font-size: 3rem;
+            color: var(--love-color);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .letter-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: #fff;
+            text-align: justify;
+        }
+
+        .final-stats {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--accent-2);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 2.5rem; color: var(--accent-1); font-weight: bold; display: block; }
+        .stat-label { font-size: 0.9rem; color: var(--text-main); text-transform: uppercase; }
+
+
+        @media (max-width: 768px) {
+            .title-glitch { font-size: 2.5rem; }
+            .memory-game { width: 95vw; height: 95vw; }
+            .memory-card { width: calc(25% - 10px); height: calc(25% - 10px); }
+            .front-face, .back-face { font-size: 2rem; }
+            .letter-container { width: 95%; padding: 20px; }
+            .final-stats { flex-direction: column; gap: 15px; }
+            .letter-text { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="starfield"></div>
+
+    <div class="screen active" id="screen-intro">
+        <h1 class="title-glitch">Operación: 3 Meses</h1>
+        <p style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 10px;">Buscando conexión segura a través de la distancia...</p>
+        
+        <div class="radar">
+            <div class="radar-point point-you"></div>
+            <div class="radar-point point-me"></div>
+        </div>
+
+        <p style="margin-bottom: 30px; color: var(--accent-2);">Conexión establecida. Distancia física detectada: irrelevante.</p>
+        <button class="btn-start" onclick="startGame()">Iniciar Enlace</button>
+    </div>
+
+    <div class="screen" id="screen-game">
+        <div class="game-info">
+            <h2>Desbloqueo de Seguridad</h2>
+            <p>Encuentra todas las parejas para desencriptar mi mensaje de aniversario.</p>
+        </div>
+        <div class="memory-game" id="memory-board">
+            </div>
+    </div>
+
+    <div class="screen" id="screen-letter">
+        <div class="letter-container">
+            <h2 class="letter-title">Para la dueña de mis sonrisas  🧡</h2>
+            
+            <div class="letter-text">
+                <p>¡Lo lograste! Mi Reina, Si estás leyendo esto, es porque resolviste el juego y porque hoy cumplimos exactamente 3 meses de haber empezado esta locura tan hermosa.
+                    tal vez no sea el mejor regalo, pero por lo menos si es un regalo que hice con mucho esfuerzo y dedicacion, solo para ti, nunca habia hecho algo como esto, 
+                    esto es lo que mas horas y dias me ha tomado, pero no me arrepiento ni un segundo, porque se todo lo que vales, y cada segundo, cada linea de este codigo y todo este 
+                    codigo completo, no es nada a comparacion de todo lo que tu te mereces y todo lo que te tengo que dar para >
+               </p>
+                <br>
+                <p> Y si mi Reina, todo este codigo que escribí línea por línea, es algo super diferente a lo que te tengo acostumbrada, la razon de ello es porque quería hacer algo diferente para ti
+                    algo unico, igual que tu, que eres una mujer unica, nunca olvides lo mucho que te amo y lo mucho que me haces sentir feliz amor.
+                    Sé que la distancia nos pone a prueba, que a veces es frustrante no poder estar sentados en el mismo sofá viendo una película o tomándonos de la mano. Pero cada minuto en llamada, 
+                    cada mensaje de buenos días, y cada noche que hablamos lindo, me demuestra que vales toda la pena del universo.</p>
+                <br>
+                <p>Eres mi conexión favorita. Feliz tercer mes, mi amor. Gracias por hacerme tan feliz. Prometo seguir acortando la distancia, paso a paso a la vez.</p>
+                <br>
+                <p>posdata, este es el nuevo contador, lo quise volver a hacer, debido a que el anterior me parecia un poco basico</p>
+            </div>
+
+            <div class="final-stats">
+                <div class="stat-item">
+                    <span class="stat-num" id="live-days">60</span>
+                    <span class="stat-label">Días Amándote</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num" id="live-hours">00</span>
+                    <span class="stat-label">Horas Pensándote</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num" id="live-mins">00</span>
+                    <span class="stat-label">Minutos Felices</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num" id="live-secs">00</span>
+                    <span class="stat-label">Segundos Extrañándote</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function generateStars() {
+            const starfield = document.getElementById('starfield');
+            const numStars = 200;
+
+            for (let i = 0; i < numStars; i++) {
+                let star = document.createElement('div');
+                star.classList.add('star');
+
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+
+                let size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+
+                star.style.animationDuration = `${Math.random() * 3 + 1}s`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                
+                starfield.appendChild(star);
+            }
+
+
+            setInterval(() => {
+                let shootingStar = document.createElement('div');
+                shootingStar.classList.add('shooting-star');
+                shootingStar.style.left = `${Math.random() * 100}vw`;
+                shootingStar.style.top = `${Math.random() * 50}vh`;
+                starfield.appendChild(shootingStar);
+                
+                setTimeout(() => shootingStar.remove(), 3000);
+            }, 4000);
+        }
+
+        window.onload = generateStars;
+
+
+        function startGame() {
+            document.getElementById('screen-intro').classList.remove('active');
+            document.getElementById('screen-intro').classList.add('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('screen-game').classList.add('active');
+                initGame();
+            }, 500);
+        }
+
+        function finishGame() {
+            document.getElementById('screen-game').classList.remove('active');
+            
+            setTimeout(() => {
+                document.getElementById('screen-letter').classList.add('active');
+                startLiveCounter();
+            }, 800);
+        }
+
+        const icons = [
+            `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`, // Corazón
+            `<svg class="svg-icon" viewBox="0 0 24 24" style="fill:var(--accent-1)"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>`, // Avión
+            `<svg class="svg-icon" viewBox="0 0 24 24" style="fill:#eecfa1"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`, // Carta
+            `<svg class="svg-icon" viewBox="0 0 24 24" style="fill:#ffd700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`, // Estrella
+            `<svg class="svg-icon" viewBox="0 0 24 24" style="fill:#a8e6cf"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>`, // Reloj
+            `<svg class="svg-icon" viewBox="0 0 24 24" style="fill:#ff8b94"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zm1-11h-2v3H8v2h3v3h2v-3h3v-2h-3V8z"/></svg>`, // Curita (sanar)
+            `<svg class="svg-icon" viewBox="0 0 24 24" style="fill:#d4a5a5"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h2v4h2V8h2v4h2V8h2v4h2V8h2v4h2V8h2v8z"/></svg>`, // Mensaje
+            `<svg class="svg-icon" viewBox="0 0 24 24" style="fill:#9dbad5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>` // Ubicación
+        ];
+
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let pairsFound = 0;
+
+        function initGame() {
+            const board = document.getElementById('memory-board');
+            board.innerHTML = ''; 
+            pairsFound = 0;
+
+
+            let gameCards = [...icons, ...icons];
+            
+
+            for (let i = gameCards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [gameCards[i], gameCards[j]] = [gameCards[j], gameCards[i]];
+            }
+
+            gameCards.forEach((iconStr, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+
+                card.dataset.framework = iconStr; 
+
+                card.innerHTML = `
+                    <div class="front-face">
+                        ${iconStr}
+                    </div>
+                    <div class="back-face">
+                        <span style="color:var(--bg-color); font-weight:bold; font-size: 2rem;">?</span>
+                    </div>
+                `;
+                
+                card.addEventListener('click', flipCard);
+                board.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flip');
+
+            if (!hasFlippedCard) {
+
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+
+            secondCard = this;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.framework === secondCard.dataset.framework;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+
+            firstCard.style.boxShadow = "0 0 20px #66fcf1";
+            secondCard.style.boxShadow = "0 0 20px #66fcf1";
+
+            resetBoard();
+            pairsFound++;
+
+            if (pairsFound === icons.length) {
+                setTimeout(() => {
+                    finishGame();
+                }, 1500);
+            }
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove('flip');
+                secondCard.classList.remove('flip');
+                resetBoard();
+            }, 1000); 
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+
+        const anniversaryDate = new Date(2025, 11, 28, 22, 0, 0);
+
+        function startLiveCounter() {
+            function update() {
+                const now = new Date();
+                const diff = now - anniversaryDate;
+
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / 1000 / 60) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+
+
+                document.getElementById('live-days').innerText = days;
+                document.getElementById('live-hours').innerText = hours.toString().padStart(2, '0');
+                document.getElementById('live-mins').innerText = minutes.toString().padStart(2, '0');
+                document.getElementById('live-secs').innerText = seconds.toString().padStart(2, '0');
+            }
+            
+            update(); 
+            setInterval(update, 1000); 
+        }
+
+
+    </script>
+</body>
+</html>
