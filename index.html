@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 Meses a tu lado</title>
+<style>
+    /* Configuraciones generales y fondo */
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #121212;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        color: #fff;
+    }
+
+    /* Contenedor del efecto de partículas */
+    #canvas-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    /* Diseño de la tarjeta central con efecto de vidrio difuminado */
+    .card {
+        position: relative;
+        z-index: 10;
+        background: rgba(255, 140, 0, 0.05);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 165, 0, 0.2);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+                    0 0 40px rgba(255, 140, 0, 0.15);
+        max-width: 400px;
+        width: 90%;
+        transition: transform 0.4s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* El corazón geométrico */
+    .heart-container {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px auto;
+        cursor: pointer;
+        animation: pulse 1.2s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .heart {
+        background-color: #ff8c00;
+        display: inline-block;
+        height: 50px;
+        position: relative;
+        top: 0;
+        transform: rotate(-45deg);
+        width: 50px;
+        box-shadow: 0 0 40px rgba(255, 140, 0, 0.8);
+        transition: all 0.5s ease;
+    }
+
+    .heart:before,
+    .heart:after {
+        content: "";
+        background-color: #ff8c00;
+        border-radius: 50%;
+        height: 50px;
+        position: absolute;
+        width: 50px;
+        box-shadow: 0 0 20px rgba(255, 140, 0, 0.4);
+    }
+
+    .heart:before {
+        top: -25px;
+        left: 0;
+    }
+
+    .heart:after {
+        left: 25px;
+        top: 0;
+    }
+
+    /* Tipografía y textos */
+    h1 {
+        color: #ffa500;
+        font-size: 2.2em;
+        margin-bottom: 10px;
+        text-shadow: 0 0 15px rgba(255, 165, 0, 0.6);
+    }
+
+    p {
+        font-size: 1.1em;
+        line-height: 1.6;
+        color: #ffdcb5;
+        margin-bottom: 20px;
+    }
+
+    /* Mensaje oculto que se revela con Javascript */
+    .secret-message {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.8s ease-out, opacity 0.8s ease-out;
+        opacity: 0;
+        font-style: italic;
+        color: #ffb74d;
+        background: rgba(255, 140, 0, 0.1);
+        padding: 0 15px;
+        border-radius: 10px;
+    }
+
+    .secret-message.show {
+        max-height: 200px;
+        opacity: 1;
+        padding: 15px;
+        border: 1px solid rgba(255, 140, 0, 0.3);
+    }
+
+    /* Animación del latido */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.15); }
+    }
+
+    .instruction {
+        font-size: 0.8em;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 25px;
+        letter-spacing: 1px;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="canvas-container"></canvas>
+
+<div class="card">
+    <div class="heart-container" onclick="toggleMessage()" title="Haz clic en el corazón">
+        <div class="heart"></div>
+    </div>
+    <h1>3 Meses Juntos</h1>
+    <p>Incluso a través de la pantalla, nuestra conexión se siente vibrante y real. El color de nuestra historia brilla con fuerza.</p>
+    
+    <div id="hidden-text" class="secret-message">
+        "La distancia es sumamente insignifcante cuando alguien significa extremadamente tanto. ¡Feliz tercer mes mi Reina Hermosa!"
+    </div>
+    
+    <div class="instruction">TOCA EL CORAZÓN</div>
+</div>
+
+<script>
+    // 1. Lógica para mostrar el mensaje secreto al hacer clic
+    function toggleMessage() {
+        const msg = document.getElementById('hidden-text');
+        msg.classList.toggle('show');
+        createExplosion(); // Llama a la función de explosión de partículas
+    }
+
+    // 2. Lógica para el fondo interactivo de partículas naranjas
+    const canvas = document.getElementById('canvas-container');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+
+    // Ajustar el tamaño del lienzo a la pantalla
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Clase que define el comportamiento geométrico de cada partícula
+    class Particle {
+        constructor(x, y, isExplosion = false) {
+            this.x = x || Math.random() * width;
+            this.y = y || height + Math.random() * 100;
+            
+            // Vectores de velocidad para la trayectoria
+            this.vx = (Math.random() - 0.5) * (isExplosion ? 10 : 1);
+            this.vy = (isExplosion ? (Math.random() - 0.5) * 10 : Math.random() * -2 - 1);
+            this.radius = Math.random() * 3 + 1.5;
+            
+            // Paleta de tonos naranjas
+            const colors = ['#FFA500', '#FF8C00', '#FF4500', '#FFB74D'];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.alpha = Math.random() * 0.5 + 0.3;
+            this.life = isExplosion ? 80 : Infinity;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            // Le da un movimiento fluido en forma de onda usando el seno
+            if(this.life === Infinity) {
+                this.x += Math.sin(this.y * 0.03) * 0.6;
+            }
+
+            if (this.life !== Infinity) {
+                this.life--;
+                this.alpha -= 0.015;
+            }
+
+            // Reiniciar partículas cuando salen de la pantalla
+            if (this.y < -10 && this.life === Infinity) {
+                this.y = height + 10;
+                this.x = Math.random() * width;
+            }
+        }
+
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, this.alpha);
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            // Efecto de luz difusa para que parezca que brillan naturalmente
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = this.color;
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    // Inicializar las partículas que flotan constantemente en el fondo
+    for (let i = 0; i < 70; i++) {
+        particles.push(new Particle());
+    }
+
+    // Función para crear la explosión al hacer clic en el corazón
+    function createExplosion() {
+        const centerX = width / 2;
+        const centerY = height / 2 - 80; 
+        for (let i = 0; i < 50; i++) {
+            particles.push(new Particle(centerX, centerY, true));
+        }
+    }
+
+    // Ciclo de animación principal
+    function animate() {
+        // Limpiar el lienzo en cada fotograma
+        ctx.clearRect(0, 0, width, height);
+        
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.update();
+            p.draw();
+            
+            // Eliminar partículas de la explosión cuando su vida útil termina
+            if (p.life <= 0) {
+                particles.splice(i, 1);
+            }
+        }
+        
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+</script>
+</body>
+</html>
